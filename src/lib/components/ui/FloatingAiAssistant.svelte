@@ -123,10 +123,21 @@
 		}
 	}
 
-	// 4. Copy message
+	// 4. Copy message (with fallback for HTTP)
 	async function copyMessage(msg: ChatMessage) {
 		try {
-			await navigator.clipboard.writeText(msg.content);
+			if (navigator.clipboard && window.isSecureContext) {
+				await navigator.clipboard.writeText(msg.content);
+			} else {
+				const textarea = document.createElement('textarea');
+				textarea.value = msg.content;
+				textarea.style.position = 'fixed';
+				textarea.style.opacity = '0';
+				document.body.appendChild(textarea);
+				textarea.select();
+				document.execCommand('copy');
+				document.body.removeChild(textarea);
+			}
 			copiedMsgId = msg.id;
 			setTimeout(() => { copiedMsgId = null; }, 2000);
 		} catch {}

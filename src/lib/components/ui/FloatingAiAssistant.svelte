@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Send, Bot, X, Sparkles, RotateCcw, RotateCw, ThumbsUp, ThumbsDown, Copy, Check, ChevronDown, User } from 'lucide-svelte';
+	import { Send, Bot, X, Sparkles, RotateCcw, RotateCw, ThumbsUp, ThumbsDown, Copy, Check, ChevronDown, User, Mic, MicOff } from 'lucide-svelte';
 	import { marked } from 'marked';
 	import { onMount } from 'svelte';
 
@@ -130,6 +130,50 @@
 			copiedMsgId = msg.id;
 			setTimeout(() => { copiedMsgId = null; }, 2000);
 		} catch {}
+	}
+
+	// Speech-to-text
+	let isListening = $state(false);
+	let speechSupported = $state(false);
+	let recognition: any = null;
+
+	onMount(() => {
+		const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+		if (SpeechRecognition) {
+			speechSupported = true;
+			recognition = new SpeechRecognition();
+			recognition.continuous = false;
+			recognition.interimResults = true;
+			recognition.lang = 'en-US';
+
+			recognition.onresult = (event: any) => {
+				let transcript = '';
+				for (let i = 0; i < event.results.length; i++) {
+					transcript += event.results[i][0].transcript;
+				}
+				message = transcript;
+				autoResize();
+			};
+
+			recognition.onend = () => {
+				isListening = false;
+			};
+
+			recognition.onerror = () => {
+				isListening = false;
+			};
+		}
+	});
+
+	function toggleMic() {
+		if (!recognition) return;
+		if (isListening) {
+			recognition.stop();
+			isListening = false;
+		} else {
+			recognition.start();
+			isListening = true;
+		}
 	}
 
 	// Drag handlers
@@ -619,6 +663,22 @@
 											{charCount}/{maxChars}
 										</span>
 									</div>
+									<div class="flex items-center gap-1.5">
+									{#if speechSupported}
+										<button
+											onclick={toggleMic}
+											disabled={loading}
+											class="mic-btn"
+											class:mic-active={isListening}
+											title={isListening ? 'Stop listening' : 'Voice input'}
+										>
+											{#if isListening}
+												<MicOff class="w-4 h-4" />
+											{:else}
+												<Mic class="w-4 h-4" />
+											{/if}
+										</button>
+									{/if}
 									<button
 										onclick={handleSend}
 										disabled={loading || !message.trim() || charCount > maxChars}
@@ -626,6 +686,7 @@
 									>
 										<Send class="w-4 h-4 transition-all duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
 									</button>
+								</div>
 								</div>
 							</div>
 						</div>
@@ -1060,6 +1121,36 @@
 
 	.input-wrapper textarea::placeholder {
 		color: #52524F;
+	}
+
+	/* Mic button */
+	.mic-btn {
+		padding: 8px;
+		background: transparent;
+		border: 1px solid rgba(54,54,54,0.4);
+		border-radius: 10px;
+		color: #858582;
+		cursor: pointer;
+		transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+	}
+	.mic-btn:hover:not(:disabled) {
+		color: #F4F5F0;
+		border-color: rgba(226,29,72,0.3);
+		background: rgba(226,29,72,0.08);
+	}
+	.mic-btn:disabled {
+		opacity: 0.25;
+		cursor: not-allowed;
+	}
+	.mic-btn.mic-active {
+		color: #E21D48;
+		border-color: rgba(226,29,72,0.4);
+		background: rgba(226,29,72,0.12);
+		animation: mic-pulse 1.5s ease-in-out infinite;
+	}
+	@keyframes mic-pulse {
+		0%, 100% { box-shadow: 0 0 0 0 rgba(226,29,72,0.3); }
+		50% { box-shadow: 0 0 0 6px rgba(226,29,72,0); }
 	}
 
 	.send-btn {

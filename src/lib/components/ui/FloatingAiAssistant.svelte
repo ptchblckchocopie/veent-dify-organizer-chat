@@ -585,25 +585,6 @@
 							{/if}
 						{/each}
 
-						<!-- 8. Follow-up suggestions -->
-						{#if messages.length > 0 && !loading && messages[messages.length - 1]?.role === 'assistant' && !messages[messages.length - 1]?.error && message.length === 0}
-							<div class="follow-up-suggestions flex flex-wrap gap-2 mt-2">
-								<button
-									class="prompt-chip"
-									onclick={() => { message = 'Can you explain that in more detail?'; handleSend(); }}
-								>
-									<span class="prompt-chip-dot"></span>
-									Tell me more
-								</button>
-								<button
-									class="prompt-chip"
-									onclick={() => { message = 'Can you walk me through the steps?'; handleSend(); }}
-								>
-									<span class="prompt-chip-dot"></span>
-									Show me how
-								</button>
-							</div>
-						{/if}
 					</div>
 
 					<!-- 2. Scroll to bottom button -->

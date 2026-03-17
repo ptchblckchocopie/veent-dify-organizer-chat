@@ -203,7 +203,7 @@
 
 	$effect(() => {
 		btnX = window.innerWidth - 64 - 24;
-		btnY = window.innerHeight - 64 - 24;
+		btnY = window.innerHeight - 64 - 40;
 	});
 
 	$effect(() => {
@@ -751,18 +751,25 @@
 	/* 6. Mobile full-screen */
 	@media (max-width: 639px) {
 		.chat-container {
-			inset: 0 !important;
+			position: fixed !important;
+			top: 0 !important;
+			left: 0 !important;
+			right: 0 !important;
+			bottom: 0 !important;
 			width: 100% !important;
 			max-width: 100% !important;
+			height: 100% !important;
 			max-height: 100% !important;
 			z-index: 70;
 			animation: none;
 		}
 		.chat-border-glow {
 			border-radius: 0;
+			height: 100%;
 		}
 		.chat-panel {
 			border-radius: 0;
+			height: 100%;
 		}
 	}
 

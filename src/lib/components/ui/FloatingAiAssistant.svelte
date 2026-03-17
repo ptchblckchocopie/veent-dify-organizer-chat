@@ -419,6 +419,7 @@
 								<div class="flex items-center gap-2">
 									<span class="text-sm font-semibold" style="color:#F4F5F0">Vee</span>
 									<span class="tag-badge tag-live">Live</span>
+									<span class="tag-badge tag-beta">Beta</span>
 								</div>
 								<span class="text-[10px] block" style="color:#858582">Dashboard Assistant</span>
 							</div>
@@ -804,6 +805,11 @@
 		background: rgba(34,197,94,0.08);
 		color: #86efac;
 		border: 1px solid rgba(34,197,94,0.12);
+	}
+	.tag-beta {
+		background: rgba(251,191,36,0.08);
+		color: #fcd34d;
+		border: 1px solid rgba(251,191,36,0.15);
 	}
 
 	.status-pulse {

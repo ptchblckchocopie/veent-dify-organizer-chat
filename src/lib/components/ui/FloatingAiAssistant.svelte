@@ -295,12 +295,12 @@
 	{#if isChatOpen}
 		<div
 			bind:this={chatRef}
-			class="chat-container fixed z-50 w-[420px] max-w-[calc(100vw-1rem)] flex flex-col"
+			class="chat-container fixed z-50 w-[420px] max-w-[calc(100vw-1rem)] flex flex-col overflow-hidden"
 			style={chatStyle}
 		>
-			<div class="chat-border-glow flex flex-col h-full">
+			<div class="chat-border-glow flex flex-col min-h-0 h-full">
 				<div
-					class="chat-panel relative flex flex-col rounded-2xl overflow-hidden h-full"
+					class="chat-panel relative flex flex-col rounded-2xl overflow-hidden min-h-0 h-full"
 				>
 					<!-- Header -->
 					<div class="chat-header flex items-center justify-between px-4 py-3 shrink-0">
@@ -341,7 +341,7 @@
 					<!-- Messages Area -->
 					<div
 						bind:this={chatContainer}
-						class="flex-1 overflow-y-auto px-4 py-3 space-y-3 scrollbar-thin min-h-[200px]"
+						class="flex-1 overflow-y-auto px-4 py-3 space-y-3 scrollbar-thin min-h-0"
 					>
 						<!-- Welcome State -->
 						{#if showWelcome && messages.length === 0}

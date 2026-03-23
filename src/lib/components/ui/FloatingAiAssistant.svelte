@@ -5,6 +5,34 @@
 
 	marked.setOptions({ breaks: true, gfm: true });
 
+	interface Props {
+		botName?: string;
+		botSubtitle?: string;
+		chatEndpoint?: string;
+		feedbackEndpoint?: string;
+		storagePrefix?: string;
+		placeholder?: string;
+		welcomeMessage?: string;
+		welcomeDescription?: string;
+		quickPrompts?: { label: string; message: string }[];
+	}
+
+	let {
+		botName = 'Vee',
+		botSubtitle = 'Dashboard Assistant',
+		chatEndpoint = '/api/chat',
+		feedbackEndpoint = '/api/feedback',
+		storagePrefix = 'vee',
+		placeholder = 'Ask Vee anything...',
+		welcomeMessage = "Hey! I'm Vee",
+		welcomeDescription = 'Your dashboard buddy. Think of me as that coworker who knows every button and menu.',
+		quickPrompts = [
+			{ label: "I'm new here", message: "I'm new here, where do I start?" },
+			{ label: 'Tickets & pricing', message: 'How do I set up tickets and pricing?' },
+			{ label: 'Event day check-in', message: 'How do I scan tickets on event day?' }
+		]
+	}: Props = $props();
+
 	function renderMarkdown(text: string): string {
 		if (!text) return '';
 		return marked.parse(text, { async: false }) as string;
@@ -58,8 +86,8 @@
 	onMount(() => {
 		mounted = true;
 		try {
-			const saved = localStorage.getItem('vee-messages');
-			const savedConvId = localStorage.getItem('vee-conversation-id');
+			const saved = localStorage.getItem(`${storagePrefix}-messages`);
+			const savedConvId = localStorage.getItem(`${storagePrefix}-conversation-id`);
 			if (saved) {
 				const parsed = JSON.parse(saved);
 				messages = parsed
@@ -78,11 +106,11 @@
 		const convId = conversationId;
 		const timeout = setTimeout(() => {
 			if (messages.length > 0) {
-				localStorage.setItem('vee-messages', serialized);
-				if (convId) localStorage.setItem('vee-conversation-id', convId);
+				localStorage.setItem(`${storagePrefix}-messages`, serialized);
+				if (convId) localStorage.setItem(`${storagePrefix}-conversation-id`, convId);
 			} else {
-				localStorage.removeItem('vee-messages');
-				localStorage.removeItem('vee-conversation-id');
+				localStorage.removeItem(`${storagePrefix}-messages`);
+				localStorage.removeItem(`${storagePrefix}-conversation-id`);
 			}
 		}, 500);
 		return () => clearTimeout(timeout);
@@ -273,7 +301,7 @@
 		const assistantIdx = messages.length - 1;
 
 		try {
-			const res = await fetch('/api/chat', {
+			const res = await fetch(chatEndpoint, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({ message: userMessage, conversation_id: conversationId })
@@ -379,8 +407,8 @@
 		messages = [];
 		conversationId = '';
 		showWelcome = true;
-		localStorage.removeItem('vee-messages');
-		localStorage.removeItem('vee-conversation-id');
+		localStorage.removeItem(`${storagePrefix}-messages`);
+		localStorage.removeItem(`${storagePrefix}-conversation-id`);
 	}
 
 	async function sendFeedback(msgIdx: number, rating: 'like' | 'dislike') {
@@ -390,7 +418,7 @@
 		messages[msgIdx].feedback = rating;
 
 		try {
-			const res = await fetch('/api/feedback', {
+			const res = await fetch(feedbackEndpoint, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({
@@ -410,6 +438,11 @@
 	function handleClickOutside(event: MouseEvent) {
 		const target = event.target as HTMLElement;
 		if (chatRef && !chatRef.contains(target) && !target.closest('.floating-ai-button')) {
+			if (target.closest('a[href]')) {
+				isChatOpen = false;
+				return;
+			}
+			event.preventDefault();
 			isChatOpen = false;
 		}
 	}
@@ -472,11 +505,11 @@
 							</div>
 							<div>
 								<div class="flex items-center gap-2">
-									<span class="text-sm font-semibold" style="color:#F4F5F0">Vee</span>
+									<span class="text-sm font-semibold" style="color:#F4F5F0">{botName}</span>
 									<span class="tag-badge tag-live">Live</span>
 									<span class="tag-badge tag-beta">Beta</span>
 								</div>
-								<span class="text-[10px] block" style="color:#858582">Dashboard Assistant</span>
+								<span class="text-[10px] block" style="color:#858582">{botSubtitle}</span>
 							</div>
 						</div>
 						<div class="flex items-center gap-1">
@@ -513,31 +546,19 @@
 									</div>
 								</div>
 								<div class="welcome-text mt-4">
-									<p class="text-sm font-medium" style="color:#F4F5F0">Hey! I'm Vee</p>
-									<p class="text-xs mt-1 max-w-[280px] leading-relaxed" style="color:#858582">Your dashboard buddy. Think of me as that coworker who knows every button and menu.</p>
+									<p class="text-sm font-medium" style="color:#F4F5F0">{welcomeMessage}</p>
+									<p class="text-xs mt-1 max-w-[280px] leading-relaxed" style="color:#858582">{welcomeDescription}</p>
 								</div>
 								<div class="welcome-prompts flex flex-wrap gap-2 mt-5 justify-center">
-									<button
-										class="prompt-chip"
-										onclick={() => { message = "I'm new here, where do I start?"; handleSend(); }}
-									>
-										<span class="prompt-chip-dot"></span>
-										I'm new here
-									</button>
-									<button
-										class="prompt-chip"
-										onclick={() => { message = 'How do I set up tickets and pricing?'; handleSend(); }}
-									>
-										<span class="prompt-chip-dot"></span>
-										Tickets & pricing
-									</button>
-									<button
-										class="prompt-chip"
-										onclick={() => { message = 'How do I scan tickets on event day?'; handleSend(); }}
-									>
-										<span class="prompt-chip-dot"></span>
-										Event day check-in
-									</button>
+									{#each quickPrompts as prompt}
+										<button
+											class="prompt-chip"
+											onclick={() => { message = prompt.message; handleSend(); }}
+										>
+											<span class="prompt-chip-dot"></span>
+											{prompt.label}
+										</button>
+									{/each}
 								</div>
 							</div>
 						{/if}
@@ -665,7 +686,7 @@
 									rows={1}
 									disabled={loading}
 									class="w-full px-4 py-2.5 bg-transparent border-none outline-none resize-none text-sm font-normal leading-relaxed disabled:opacity-50"
-									placeholder="Ask Vee anything..."
+									placeholder={placeholder}
 									style="scrollbar-width:none;max-height:120px;color:#F4F5F0;"
 								></textarea>
 								<div class="flex items-center justify-between px-3 pb-2">

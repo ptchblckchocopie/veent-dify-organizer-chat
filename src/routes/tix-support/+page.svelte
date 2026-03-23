@@ -1,72 +1,75 @@
+<script lang="ts">
+	import '../../app.css';
+	import FloatingAiAssistant from '$lib/components/ui/FloatingAiAssistant.svelte';
+</script>
+
 <svelte:head>
 	<title>Veent Tix Support</title>
-	{@html `<script>window.difyChatbotConfig = { token: 'wHjfix4x8U53nv9u' };</script>`}
-	{@html `<script src="https://udify.app/embed.min.js" id="wHjfix4x8U53nv9u" defer></script>`}
 </svelte:head>
 
-<div class="min-h-screen bg-zinc-950 text-zinc-100 font-sans flex items-center justify-center">
-	<div class="text-center">
-		<div class="flex items-center justify-center gap-2 mb-4">
+<div class="min-h-screen bg-zinc-950 text-zinc-100 font-sans">
+	<!-- Nav -->
+	<nav class="flex items-center justify-between px-4 sm:px-8 py-4 border-b border-zinc-800/50 gap-4">
+		<div class="flex items-center gap-2 shrink-0">
 			<div class="bg-red-600 text-white text-xs font-bold px-2 py-1 rounded">VEENT</div>
-			<div class="bg-red-600 text-white text-xs font-bold px-2 py-1 rounded">TIX SUPPORT</div>
+			<div class="bg-red-600 text-white text-xs font-bold px-2 py-1 rounded hidden sm:block">TIX SUPPORT</div>
 		</div>
-		<p class="text-sm text-zinc-500">Click the chat button to get started</p>
+		<div class="flex items-center gap-3 sm:gap-6 text-sm text-zinc-400 overflow-x-auto">
+			<a href="/" class="px-3 py-1.5 sm:px-4 sm:py-2 bg-teal-700 text-white text-xs font-medium rounded-lg hover:bg-teal-600 transition-colors shrink-0">Organizer Bot</a>
+			<a href="https://dashboard.veent.io" target="_blank" class="hover:text-white transition-colors hidden sm:block shrink-0">Open Dashboard</a>
+			<a href="https://veent.io/contacts" target="_blank" class="hover:text-white transition-colors shrink-0">Support</a>
+			<a href="https://dashboard.veent.io" target="_blank" class="px-3 py-1.5 sm:px-4 sm:py-2 bg-red-700 text-white text-xs font-medium rounded-lg hover:bg-red-600 transition-colors shrink-0">SIGN IN</a>
+		</div>
+	</nav>
+
+	<div class="max-w-4xl mx-auto px-8 py-20">
+		<h1 class="text-5xl font-bold leading-tight mb-6">
+			Ticket Support<br />Made Simple.
+		</h1>
+		<p class="text-lg text-zinc-400 max-w-lg mb-10 leading-relaxed">
+			Get instant help with ticket purchases, order issues, refunds,
+			and everything about your event tickets. Your AI assistant for ticket support.
+		</p>
+		<div class="flex items-center gap-4">
+			<a href="https://dashboard.veent.io" target="_blank" class="px-6 py-3 bg-red-700 text-white text-sm font-medium rounded-lg hover:bg-red-600 transition-colors">
+				Open Dashboard
+			</a>
+			<a href="https://veent.io/contacts" target="_blank" class="px-6 py-3 text-zinc-300 text-sm font-medium hover:text-white transition-colors">
+				Contact Support →
+			</a>
+		</div>
+
+		<!-- Feature cards -->
+		<div class="mt-20 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+			{#each [
+				{ name: 'Ticket Purchases', desc: 'Help with buying tickets, payment methods, and confirmations', icon: '🎫' },
+				{ name: 'Order Issues', desc: 'Track orders, resolve errors, and manage your bookings', icon: '📋' },
+				{ name: 'Refunds & Transfers', desc: 'Request refunds, transfer tickets, and cancellation help', icon: '💳' },
+			] as feature}
+				<div class="rounded-xl bg-zinc-900/60 border border-zinc-800/50 p-4 hover:border-red-700/50 transition-colors">
+					<div class="w-full h-32 rounded-lg bg-gradient-to-br from-zinc-800 to-zinc-900 mb-3 flex items-center justify-center">
+						<span class="text-3xl">{feature.icon}</span>
+					</div>
+					<h3 class="text-sm font-semibold text-zinc-200">{feature.name}</h3>
+					<p class="text-xs text-zinc-500 mt-1">{feature.desc}</p>
+				</div>
+			{/each}
+		</div>
 	</div>
 </div>
 
-<style>
-	:global(#dify-chatbot-bubble-button) {
-		position: fixed !important;
-		z-index: 2147483647 !important;
-		background: linear-gradient(135deg, #ef4444, #dc2626) !important;
-		width: 60px !important;
-		height: 60px !important;
-		right: 28px !important;
-		bottom: 28px !important;
-		border-radius: 50% !important;
-		border: none !important;
-		cursor: pointer !important;
-		box-shadow: 0 4px 14px rgba(220,38,38,0.45), 0 0 0 0 rgba(220,38,38,0.3) !important;
-		transition: transform 0.25s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.3s ease !important;
-		animation: bubbleEntrance 0.6s cubic-bezier(0.34,1.56,0.64,1) both, bubblePulse 3s ease-in-out 2s infinite !important;
-	}
-	:global(#dify-chatbot-bubble-button:hover) {
-		transform: scale(1.1) !important;
-		box-shadow: 0 6px 20px rgba(220,38,38,0.5), 0 0 0 0 rgba(220,38,38,0) !important;
-	}
-	:global(#dify-chatbot-bubble-button:active) { transform: scale(0.95) !important; }
-	:global(#dify-chatbot-bubble-button svg) {
-		width: 28px !important;
-		height: 28px !important;
-		transition: transform 0.3s ease !important;
-	}
-	:global(#dify-chatbot-bubble-button:hover svg) { transform: rotate(15deg) !important; }
-	:global(#dify-chatbot-bubble-window) {
-		position: fixed !important;
-		z-index: 2147483646 !important;
-		width: 24rem !important;
-		height: 42rem !important;
-		max-height: calc(100vh - 120px) !important;
-		right: 28px !important;
-		bottom: 100px !important;
-		border-radius: 16px !important;
-		border: 1px solid rgba(255,255,255,0.08) !important;
-		box-shadow: 0 25px 60px rgba(0,0,0,0.5), 0 10px 20px rgba(0,0,0,0.3) !important;
-		animation: windowSlideUp 0.35s cubic-bezier(0.16,1,0.3,1) both !important;
-		overflow: hidden !important;
-	}
-	:global(#dify-chatbot-bubble-window iframe) { border: none !important; border-radius: 16px !important; }
-	@keyframes bubbleEntrance {
-		0% { transform: scale(0) rotate(-45deg); opacity: 0; }
-		60% { transform: scale(1.15) rotate(5deg); opacity: 1; }
-		100% { transform: scale(1) rotate(0deg); opacity: 1; }
-	}
-	@keyframes bubblePulse {
-		0%, 100% { box-shadow: 0 4px 14px rgba(220,38,38,0.45), 0 0 0 0 rgba(220,38,38,0.3); }
-		50% { box-shadow: 0 4px 14px rgba(220,38,38,0.45), 0 0 0 10px rgba(220,38,38,0); }
-	}
-	@keyframes windowSlideUp {
-		0% { transform: translateY(20px) scale(0.96); opacity: 0; }
-		100% { transform: translateY(0) scale(1); opacity: 1; }
-	}
-</style>
+<FloatingAiAssistant
+	botName="Tix"
+	botSubtitle="Ticket Support"
+	chatEndpoint="/api/tix-chat"
+	feedbackEndpoint="/api/tix-feedback"
+	storagePrefix="tix"
+	placeholder="Ask about tickets..."
+	welcomeMessage="Hey! I'm Tix"
+	welcomeDescription="Your ticket support buddy. I can help with purchases, orders, refunds, and anything ticket-related."
+	quickPrompts={[
+		{ label: 'Buy tickets', message: 'How do I buy tickets?' },
+		{ label: 'Track my order', message: 'How can I track my ticket order?' },
+		{ label: 'Request refund', message: 'How do I request a refund?' }
+	]}
+/>

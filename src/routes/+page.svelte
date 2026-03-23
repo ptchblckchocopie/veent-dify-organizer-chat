@@ -9,15 +9,16 @@
 
 <div class="min-h-screen bg-zinc-950 text-zinc-100 font-sans">
 	<!-- Nav -->
-	<nav class="flex items-center justify-between px-8 py-4 border-b border-zinc-800/50">
-		<div class="flex items-center gap-2">
+	<nav class="flex items-center justify-between px-4 sm:px-8 py-4 border-b border-zinc-800/50 gap-4">
+		<div class="flex items-center gap-2 shrink-0">
 			<div class="bg-teal-600 text-white text-xs font-bold px-2 py-1 rounded">VEENT</div>
-			<div class="bg-teal-600 text-white text-xs font-bold px-2 py-1 rounded">DASHBOARD</div>
+			<div class="bg-teal-600 text-white text-xs font-bold px-2 py-1 rounded hidden sm:block">DASHBOARD</div>
 		</div>
-		<div class="flex items-center gap-6 text-sm text-zinc-400">
-			<a href="https://dashboard.veent.io" target="_blank" class="hover:text-white transition-colors">Open Dashboard</a>
-			<a href="https://veent.io/contacts" target="_blank" class="hover:text-white transition-colors">Support</a>
-			<a href="https://dashboard.veent.io" target="_blank" class="px-4 py-2 bg-teal-700 text-white text-xs font-medium rounded-lg hover:bg-teal-600 transition-colors">SIGN IN</a>
+		<div class="flex items-center gap-3 sm:gap-6 text-sm text-zinc-400 overflow-x-auto">
+			<a href="/tix-support" class="px-3 py-1.5 sm:px-4 sm:py-2 bg-red-600 text-white text-xs font-medium rounded-lg hover:bg-red-500 transition-colors shrink-0">Ticket Bot</a>
+			<a href="https://dashboard.veent.io" target="_blank" class="hover:text-white transition-colors hidden sm:block shrink-0">Open Dashboard</a>
+			<a href="https://veent.io/contacts" target="_blank" class="hover:text-white transition-colors shrink-0">Support</a>
+			<a href="https://dashboard.veent.io" target="_blank" class="px-3 py-1.5 sm:px-4 sm:py-2 bg-teal-700 text-white text-xs font-medium rounded-lg hover:bg-teal-600 transition-colors shrink-0">SIGN IN</a>
 		</div>
 	</nav>
 

@@ -4,5 +4,5 @@ import type { RequestHandler } from './$types';
 
 export const POST: RequestHandler = async ({ request }) => {
 	const { message_id, rating } = await request.json();
-	return sendFeedback(message_id, rating, env.DIFY_API_KEY, 'organizer-user');
+	return sendFeedback(message_id, rating, env.TIX_DIFY_API_KEY, 'tix-user');
 };

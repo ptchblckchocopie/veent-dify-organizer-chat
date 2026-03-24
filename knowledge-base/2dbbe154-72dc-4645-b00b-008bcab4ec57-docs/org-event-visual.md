@@ -1,0 +1,3 @@
+## Edit Event — Visual (Theme, Logo, Poster, Background)
+
+Access via: **Event Management Page > Edit Event button (red pencil icon) > Visual sub-page**. Heading: "Website Visual". Note: "Edit your website visual below. Changes update automatically on your website." The fields are: **Theme** (click "Select Theme" button to choose a theme for your event page), **Logo** (organization logo image with Remove and Change buttons), **Event Logo** (click "Select Event Logo" button to choose an event-specific logo), **Poster** (event poster image with Remove and Change buttons), **Background Image** (page background image with Remove and Change buttons), and **Embed Link** (text input for embedded content URL). Buttons: Cancel and Save Changes.

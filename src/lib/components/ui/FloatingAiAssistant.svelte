@@ -301,10 +301,16 @@
 		const assistantIdx = messages.length - 1;
 
 		try {
+			// Build conversation history for context
+			const history = messages
+				.filter(m => m.content && !m.error)
+				.slice(0, -1) // exclude the empty assistant message we just added
+				.map(m => ({ role: m.role, content: m.content }));
+
 			const res = await fetch(chatEndpoint, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ message: userMessage, conversation_id: conversationId })
+				body: JSON.stringify({ message: userMessage, conversation_id: conversationId, history })
 			});
 
 			if (!res.ok) {

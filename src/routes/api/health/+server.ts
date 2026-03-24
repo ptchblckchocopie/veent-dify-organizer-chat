@@ -1,18 +1,29 @@
 import { env } from '$env/dynamic/private';
+import { search } from '$lib/server/rag';
 import type { RequestHandler } from './$types';
 
 export const GET: RequestHandler = async () => {
 	const checks: Record<string, string> = { server: 'ok' };
 
+	// Check Groq API
 	try {
-		const res = await fetch(`${env.DIFY_API_URL}/parameters`, {
-			headers: { 'Authorization': `Bearer ${env.DIFY_API_KEY}` }
+		const res = await fetch('https://api.groq.com/openai/v1/models', {
+			headers: { 'Authorization': `Bearer ${env.GROQ_API_KEY}` }
 		});
-		checks.dify_organizer = res.ok ? 'ok' : `error (${res.status})`;
+		checks.groq = res.ok ? 'ok' : `error (${res.status})`;
 	} catch {
-		checks.dify_organizer = 'unreachable';
+		checks.groq = 'unreachable';
 	}
 
+	// Check knowledge base loaded
+	try {
+		const results = search('test', 1);
+		checks.knowledge_base = results.length > 0 ? 'ok' : 'empty';
+	} catch {
+		checks.knowledge_base = 'error';
+	}
+
+	// Check Tix bot Dify API
 	try {
 		const res = await fetch(`${env.DIFY_API_URL}/parameters`, {
 			headers: { 'Authorization': `Bearer ${env.TIX_DIFY_API_KEY}` }

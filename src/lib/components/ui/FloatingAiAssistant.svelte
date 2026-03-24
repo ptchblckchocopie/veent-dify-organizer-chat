@@ -1243,6 +1243,8 @@
 		line-height: 1.6;
 		word-wrap: break-word;
 		overflow-wrap: break-word;
+		max-width: 100%;
+		overflow-x: hidden;
 	}
 	.prose-chat :global(p) {
 		margin: 0 0 0.5em 0;
@@ -1330,5 +1332,43 @@
 		border: none;
 		border-top: 1px solid rgba(54,54,54,0.5);
 		margin: 0.75em 0;
+	}
+	.prose-chat :global(table) {
+		width: 100%;
+		border-collapse: collapse;
+		margin: 0.5em 0;
+		font-size: 0.85em;
+		display: block;
+		overflow-x: auto;
+		-webkit-overflow-scrolling: touch;
+	}
+	.prose-chat :global(thead) {
+		display: table;
+		width: 100%;
+		table-layout: fixed;
+	}
+	.prose-chat :global(tbody) {
+		display: table;
+		width: 100%;
+		table-layout: fixed;
+	}
+	.prose-chat :global(th) {
+		background: rgba(226,29,72,0.08);
+		color: #F4F5F0;
+		font-weight: 600;
+		text-align: left;
+		padding: 6px 8px;
+		border: 1px solid rgba(54,54,54,0.5);
+		white-space: nowrap;
+	}
+	.prose-chat :global(td) {
+		padding: 5px 8px;
+		border: 1px solid rgba(54,54,54,0.4);
+		color: #d4d4d0;
+		word-wrap: break-word;
+		overflow-wrap: break-word;
+	}
+	.prose-chat :global(tr:hover) {
+		background: rgba(37,35,35,0.4);
 	}
 </style>

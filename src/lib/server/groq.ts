@@ -120,13 +120,42 @@ export async function streamChat(
 			continue;
 		}
 
-		// For other errors, don't fallback
+		// If fallback also rate limited, wait and retry once
+		if (res.status === 429 && model === fallbackModel) {
+			console.log(`[Groq] Both models rate limited, waiting 5s and retrying ${fallbackModel}`);
+			await new Promise(r => setTimeout(r, 5000));
+			res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+				method: 'POST',
+				headers: {
+					'Authorization': `Bearer ${apiKey}`,
+					'Content-Type': 'application/json'
+				},
+				body: JSON.stringify({
+					model: fallbackModel,
+					messages,
+					temperature: 0.7,
+					max_completion_tokens: 1024,
+					stream: true
+				})
+			});
+			break;
+		}
+
 		break;
 	}
 
 	if (!res || !res.ok) {
-		const err = res ? await res.text() : 'No response';
-		return new Response(JSON.stringify({ error: err }), { status: res?.status || 500 });
+		// Return a friendly bot message instead of an error
+		const fallbackMessage = "I'm a little busy right now — give me a moment and try again!";
+		const encoder = new TextEncoder();
+		const messageId = crypto.randomUUID();
+		const events = [
+			`data: ${JSON.stringify({ event: 'message', answer: fallbackMessage, message_id: messageId, conversation_id: '' })}\n\n`,
+			`data: ${JSON.stringify({ event: 'message_end', message_id: messageId, conversation_id: '' })}\n\n`
+		];
+		return new Response(events.join(''), {
+			headers: { 'Content-Type': 'text/event-stream', 'Cache-Control': 'no-cache', 'Connection': 'keep-alive' }
+		});
 	}
 
 	// Transform OpenAI SSE format to match what our frontend expects (Dify format)

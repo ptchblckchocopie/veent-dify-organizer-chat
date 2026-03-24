@@ -87,24 +87,46 @@ export async function streamChat(
 		{ role: 'user', content: message }
 	];
 
-	const res = await fetchWithRetry('https://api.groq.com/openai/v1/chat/completions', {
-		method: 'POST',
-		headers: {
-			'Authorization': `Bearer ${apiKey}`,
-			'Content-Type': 'application/json'
-		},
-		body: JSON.stringify({
-			model: env.GROQ_MODEL || 'llama-3.3-70b-versatile',
-			messages,
-			temperature: 0.7,
-			max_completion_tokens: 1024,
-			stream: true
-		})
-	});
+	const primaryModel = env.GROQ_MODEL || 'llama-3.3-70b-versatile';
+	const fallbackModel = env.GROQ_FALLBACK_MODEL || 'llama-3.1-8b-instant';
+	const models = [primaryModel, fallbackModel];
 
-	if (!res.ok) {
-		const err = await res.text();
-		return new Response(JSON.stringify({ error: err }), { status: res.status });
+	let res: Response | null = null;
+
+	for (const model of models) {
+		res = await fetchWithRetry('https://api.groq.com/openai/v1/chat/completions', {
+			method: 'POST',
+			headers: {
+				'Authorization': `Bearer ${apiKey}`,
+				'Content-Type': 'application/json'
+			},
+			body: JSON.stringify({
+				model,
+				messages,
+				temperature: 0.7,
+				max_completion_tokens: 1024,
+				stream: true
+			})
+		});
+
+		if (res.ok) {
+			if (model !== primaryModel) console.log(`[Groq] Fell back to ${model}`);
+			break;
+		}
+
+		// If rate limited (429), try fallback model
+		if (res.status === 429 && model === primaryModel) {
+			console.log(`[Groq] ${primaryModel} rate limited, trying ${fallbackModel}`);
+			continue;
+		}
+
+		// For other errors, don't fallback
+		break;
+	}
+
+	if (!res || !res.ok) {
+		const err = res ? await res.text() : 'No response';
+		return new Response(JSON.stringify({ error: err }), { status: res?.status || 500 });
 	}
 
 	// Transform OpenAI SSE format to match what our frontend expects (Dify format)

@@ -1,54 +1,53 @@
-## Form-Builder
+## Form Builder — How to Edit Registration Forms
 
-*Deep crawl — remaining pages from Veent Dashboard*
+### Where is the Form Builder?
+The form builder is on the **RIGHT SIDE** of the **Registration** tab page. The left side shows Tickets, and the right side shows your registration form fields.
 
-### Form Edit Mode
+### Form Builder Layout
+At the top of the form section you see:
+- Your form name as a tab (e.g., "Nukie Blaze Run Registration Form")
+- Two buttons: **Preview** and **Edit**
+- Below that: the form fields list
 
-Dashboard
-Wallet
-Zoe Pabillaran
-Edit Details
-Settings
-Visual
-Contacts
-Registration Instructions
-Back
-Basic information
+### Default Form Fields (shown on every form)
+- **First Name** * (required)
+- **Last Name** * (required)
+- **Contact Number** * (required)
+- **Email** * (required)
 
-Edit your event details below. Changes update automatically on your website.
+These default fields cannot be removed.
 
-Event name
-Subdomain
-.veent.net
-Event Country / Currency
+### How to Preview the Form
+1. Click the **Registration** tab
+2. On the right side, click the **Preview** button above the form fields
+3. A preview shows how the form will look to attendees
 
-Country cannot be changed after event creation.
+### How to Edit Form Fields
+1. Click the **Registration** tab
+2. On the right side, click the **Edit** button above the form fields
+3. The form enters edit mode where you can:
+   - **Add new fields** — click the **+ Add Field** button
+   - **Reorder fields** — drag and drop fields to change their order
+   - **Edit a field** — click on a field to change its label, type, placeholder, or required setting
+   - **Delete a field** — click the delete icon on a field to remove it
+4. Click **Save Changes** when done
 
-Event address
-+
-−
- Leaflet | © OpenStreetMap contributors
-Event date
- Philippine Standard Time
+### Available Field Types When Adding a Field
+- **Text** — single-line text input (e.g., Name)
+- **Textarea** — multi-line text (e.g., Special requests)
+- **Email** — email input with validation
+- **Number** — numeric input (e.g., Age)
+- **Select/Dropdown** — single choice from a list (e.g., T-shirt size)
+- **Multiselect** — multiple choices from a list (e.g., Dietary preferences)
+- **Checkbox** — yes/no checkbox (e.g., Terms agreement)
+- **Date** — date picker (e.g., Birthday)
+- **File** — file upload (e.g., ID photo)
 
-Enable Recurring Event
+### How to Create an Additional Form
+1. Click the **Registration** tab
+2. Click the **+ Add new form** button at the top of the form section
+3. Give the new form a name
+4. Add fields to it using the form builder
 
-You can enable or disable recurring events at any time.
-
-For same-day events, use the same date for both fields.
-
-Event Starts
-Date
-3/13/2026
-Time
-Event Ends
-Date
-3/14/2026
-Time
-Event description
-
-Nukieee
-
-Cancel
-Save changes
-Veent
+### How to Switch Between Forms
+If you have multiple forms, they appear as **tabs** at the top of the form section. Click a tab to switch to that form.

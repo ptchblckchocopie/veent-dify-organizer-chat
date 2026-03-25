@@ -12,6 +12,7 @@ WORKDIR /app
 COPY --from=builder /app/build ./build
 COPY --from=builder /app/package*.json ./
 COPY --from=builder /app/knowledge-base ./knowledge-base
+COPY --from=builder /app/knowledge-base-tix ./knowledge-base-tix
 RUN npm ci --omit=dev
 
 ENV NODE_ENV=production

@@ -1,36 +1,42 @@
 import { env } from '$env/dynamic/private';
 import { search } from '$lib/server/rag';
+import { searchTix } from '$lib/server/rag-tix';
 import type { RequestHandler } from './$types';
 
 export const GET: RequestHandler = async () => {
 	const checks: Record<string, string> = { server: 'ok' };
 
-	// Check Groq API
+	// Check Groq API (organizer)
 	try {
 		const res = await fetch('https://api.groq.com/openai/v1/models', {
 			headers: { 'Authorization': `Bearer ${env.GROQ_API_KEY}` }
 		});
-		checks.groq = res.ok ? 'ok' : `error (${res.status})`;
+		checks.groq_organizer = res.ok ? 'ok' : `error (${res.status})`;
 	} catch {
-		checks.groq = 'unreachable';
+		checks.groq_organizer = 'unreachable';
 	}
 
-	// Check knowledge base loaded
+	// Check Groq API (tix)
 	try {
-		const results = search('test', 1);
-		checks.knowledge_base = results.length > 0 ? 'ok' : 'empty';
-	} catch {
-		checks.knowledge_base = 'error';
-	}
-
-	// Check Tix bot Dify API
-	try {
-		const res = await fetch(`${env.DIFY_API_URL}/parameters`, {
-			headers: { 'Authorization': `Bearer ${env.TIX_DIFY_API_KEY}` }
+		const res = await fetch('https://api.groq.com/openai/v1/models', {
+			headers: { 'Authorization': `Bearer ${env.TIX_GROQ_API_KEY}` }
 		});
-		checks.dify_tix = res.ok ? 'ok' : `error (${res.status})`;
+		checks.groq_tix = res.ok ? 'ok' : `error (${res.status})`;
 	} catch {
-		checks.dify_tix = 'unreachable';
+		checks.groq_tix = 'unreachable';
+	}
+
+	// Check knowledge bases
+	try {
+		checks.kb_organizer = search('test', 1).length > 0 ? 'ok' : 'empty';
+	} catch {
+		checks.kb_organizer = 'error';
+	}
+
+	try {
+		checks.kb_tix = searchTix('test', 1).length > 0 ? 'ok' : 'empty';
+	} catch {
+		checks.kb_tix = 'error';
 	}
 
 	const allOk = Object.values(checks).every(v => v === 'ok');

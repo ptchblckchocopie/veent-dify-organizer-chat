@@ -75,13 +75,20 @@ export async function streamTixChat(
 		{ role: 'user', content: message }
 	];
 
-	const primaryModel = env.TIX_GROQ_MODEL || env.GROQ_MODEL || 'llama-3.3-70b-versatile';
-	const fallbackModel = env.TIX_GROQ_FALLBACK_MODEL || env.GROQ_FALLBACK_MODEL || 'llama-3.1-8b-instant';
-	const models = [primaryModel, fallbackModel];
+	// Model fallback chain — each has separate rate limits on Groq free tier
+	const modelChain = [
+		env.TIX_GROQ_MODEL || env.GROQ_MODEL || 'llama-3.3-70b-versatile',
+		env.TIX_GROQ_FALLBACK_MODEL || env.GROQ_FALLBACK_MODEL || 'llama-3.1-8b-instant',
+		'meta-llama/llama-4-scout-17b-16e-instruct',
+		'openai/gpt-oss-20b',
+		'openai/gpt-oss-120b',
+	];
 
 	let res: Response | null = null;
 
-	for (const model of models) {
+	for (let i = 0; i < modelChain.length; i++) {
+		const model = modelChain[i];
+
 		res = await fetchWithRetry('https://api.groq.com/openai/v1/chat/completions', {
 			method: 'POST',
 			headers: {
@@ -98,33 +105,31 @@ export async function streamTixChat(
 		});
 
 		if (res.ok) {
-			if (model !== primaryModel) console.log(`[Groq-Tix] Fell back to ${model}`);
+			if (i > 0) console.log(`[Groq-Tix] Fell back to ${model} (choice #${i + 1})`);
 			break;
 		}
 
-		if (res.status === 429 && model === primaryModel) {
-			console.log(`[Groq-Tix] ${primaryModel} rate limited, trying ${fallbackModel}`);
+		if (res.status === 429) {
+			console.log(`[Groq-Tix] ${model} rate limited, trying next...`);
+			if (i === modelChain.length - 1) {
+				console.log(`[Groq-Tix] All models rate limited, waiting 5s and retrying ${model}`);
+				await new Promise(r => setTimeout(r, 5000));
+				res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+					method: 'POST',
+					headers: {
+						'Authorization': `Bearer ${apiKey}`,
+						'Content-Type': 'application/json'
+					},
+					body: JSON.stringify({
+						model,
+						messages,
+						temperature: 0.7,
+						max_completion_tokens: 1024,
+						stream: true
+					})
+				});
+			}
 			continue;
-		}
-
-		if (res.status === 429 && model === fallbackModel) {
-			console.log(`[Groq-Tix] Both models rate limited, waiting 5s`);
-			await new Promise(r => setTimeout(r, 5000));
-			res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-				method: 'POST',
-				headers: {
-					'Authorization': `Bearer ${apiKey}`,
-					'Content-Type': 'application/json'
-				},
-				body: JSON.stringify({
-					model: fallbackModel,
-					messages,
-					temperature: 0.7,
-					max_completion_tokens: 1024,
-					stream: true
-				})
-			});
-			break;
 		}
 
 		break;

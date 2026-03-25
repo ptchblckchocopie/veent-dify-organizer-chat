@@ -87,13 +87,20 @@ export async function streamChat(
 		{ role: 'user', content: message }
 	];
 
-	const primaryModel = env.GROQ_MODEL || 'llama-3.3-70b-versatile';
-	const fallbackModel = env.GROQ_FALLBACK_MODEL || 'llama-3.1-8b-instant';
-	const models = [primaryModel, fallbackModel];
+	// Model fallback chain — each has separate rate limits on Groq free tier
+	const modelChain = [
+		env.GROQ_MODEL || 'llama-3.3-70b-versatile',        // Best quality, 1K RPD
+		env.GROQ_FALLBACK_MODEL || 'llama-3.1-8b-instant',  // Fastest, 14.4K RPD
+		'meta-llama/llama-4-scout-17b-16e-instruct',         // Newest, 1K RPD
+		'openai/gpt-oss-20b',                                // Fast, 1K RPD
+		'openai/gpt-oss-120b',                               // Most detailed, 1K RPD
+	];
 
 	let res: Response | null = null;
 
-	for (const model of models) {
+	for (let i = 0; i < modelChain.length; i++) {
+		const model = modelChain[i];
+
 		res = await fetchWithRetry('https://api.groq.com/openai/v1/chat/completions', {
 			method: 'POST',
 			headers: {
@@ -110,37 +117,36 @@ export async function streamChat(
 		});
 
 		if (res.ok) {
-			if (model !== primaryModel) console.log(`[Groq] Fell back to ${model}`);
+			if (i > 0) console.log(`[Groq] Fell back to ${model} (choice #${i + 1})`);
 			break;
 		}
 
-		// If rate limited (429), try fallback model
-		if (res.status === 429 && model === primaryModel) {
-			console.log(`[Groq] ${primaryModel} rate limited, trying ${fallbackModel}`);
+		// If rate limited, try next model in chain
+		if (res.status === 429) {
+			console.log(`[Groq] ${model} rate limited, trying next...`);
+			// On last model, wait 5s and retry
+			if (i === modelChain.length - 1) {
+				console.log(`[Groq] All models rate limited, waiting 5s and retrying ${model}`);
+				await new Promise(r => setTimeout(r, 5000));
+				res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+					method: 'POST',
+					headers: {
+						'Authorization': `Bearer ${apiKey}`,
+						'Content-Type': 'application/json'
+					},
+					body: JSON.stringify({
+						model,
+						messages,
+						temperature: 0.7,
+						max_completion_tokens: 1024,
+						stream: true
+					})
+				});
+			}
 			continue;
 		}
 
-		// If fallback also rate limited, wait and retry once
-		if (res.status === 429 && model === fallbackModel) {
-			console.log(`[Groq] Both models rate limited, waiting 5s and retrying ${fallbackModel}`);
-			await new Promise(r => setTimeout(r, 5000));
-			res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-				method: 'POST',
-				headers: {
-					'Authorization': `Bearer ${apiKey}`,
-					'Content-Type': 'application/json'
-				},
-				body: JSON.stringify({
-					model: fallbackModel,
-					messages,
-					temperature: 0.7,
-					max_completion_tokens: 1024,
-					stream: true
-				})
-			});
-			break;
-		}
-
+		// For non-rate-limit errors, don't try more models
 		break;
 	}
 

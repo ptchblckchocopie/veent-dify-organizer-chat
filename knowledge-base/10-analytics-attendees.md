@@ -42,6 +42,15 @@
 
 Export includes: registrant info, form responses, ticket details, order data, check-in status.
 
+### Per-Registrant Actions
+When you click on a registrant row or find their entry, you can:
+- **View details** — see their full registration info, form responses, ticket details, and order data
+- **Resend Email** — resend the confirmation email with their QR code ticket
+- **Check In / Undo Check In** — manually check them in or reverse it
+- View their **order status** — confirmed, pending, or failed
+
 ### FAQ
 **Q: How often do analytics update?** Real-time. Refresh to see latest.
 **Q: How do I export my registrant list?** Attendees tab → Export → choose format.
+**Q: How do I resend a confirmation email?** Attendees tab → find the registrant → click Resend Email.
+**Q: How do I manually check someone in?** Attendees tab → select the row checkbox → click Check In button.

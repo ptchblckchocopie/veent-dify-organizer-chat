@@ -11,7 +11,7 @@ Click the **Registration** tab → tickets are on the **LEFT SIDE** of the page.
 | Field | Description |
 |-------|-------------|
 | **Ticket Name** | Name of the ticket type |
-| **Price** | Price in ₱ (set to 0 for free tickets) |
+| **Price** | Price in ₱. **Important: prices are entered in cents.** For example, ₱1,000.00 = enter 100000. ₱500 = enter 50000. ₱0 = free ticket. |
 | **Quantity** | Total stock available |
 | **Ticket Image** | Optional image upload |
 | **Description** | Optional description |

@@ -1,8 +1,9 @@
-## Upcoming Events on Veent Tix — March 2026
+## Past Events on Veent Tix — March 2026
 
-Keywords: upcoming events, show me events, what events, event listings, event schedule, events this month, events near me, things to do, concerts, fun run, marathon, workshop
+Note: All events in this file have already ended. Do NOT include these when listing upcoming events. These are kept for historical reference and total event counts only.
 
-Below is the list of upcoming events, event listings, and event schedules for March 2026 on Veent Tix.
+Below is the list of past events for March 2026 on Veent Tix.
+
 Event: The Shady Brunch: Heated Puksaan
 Event Link: https://theshadybrunch.veent.net
 Date: Saturday, March 7, 2026

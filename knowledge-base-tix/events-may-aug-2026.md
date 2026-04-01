@@ -3,18 +3,19 @@
 Keywords: upcoming events, show me events, what events, event listings, event schedule, events this month, events near me, things to do, concerts, fun run, marathon, trail run
 
 Below is the list of upcoming events, event listings, and event schedules for May to August 2026 on Veent Tix.
+Important: These are upcoming events. When a user asks about upcoming events, show at most 5 events from this file sorted from nearest date first. After listing, say: "For more events, visit https://www.veent.io/"
+
 Event: Dahilayan Mountain Trail Ultra 2026
 Event Link: https://dahilayanmountaintrailultra2026.veent.net
 Date: Saturday, May 2, 2026
 Venue: Dahilayan, Bukidnon
-Organizer Contact: Dahilayan Mountain Trail Ultra 2026 on FB — Facebook: https://www.facebook.com/share/182c8ZWWvA/
+  Organizer Contact: Dahilayan Mountain Trail Ultra 2026 on FB — Facebook: https://www.facebook.com/share/182c8ZWWvA/
 
 Event: The Feast North Luzon Grand Feast
 Event Link: https://northluzongrandfeast.veent.net
 Date: Saturday, May 9, 2026
 Time: 8:00 AM - 5:00 PM
 Ticket Prices:
-
 - Youth / Senior / Student: ₱500.00
 - Regular: ₱700.00
 - Premium: ₱1,200.00
@@ -31,7 +32,6 @@ Event Link: https://sevenseaspiraterun.veent.net
 Date: Saturday, May 31, 2026
 Time: 4:00 AM - 12:00 PM
 Ticket Prices:
-
 - 1KM - Lil Pirates (Min. age: 5 y.o): ₱850.00
 - 3KM - Bucaneer Dash: ₱1,250.00
 - 5KM - Sailor's Quest: ₱1,550.00
@@ -41,7 +41,7 @@ Event: Magdiwata Festival 2026 Half-Marathon
 Event Link: https://magdiwatafestival2026halfmarathon.veent.net
 Date: Sunday, May 31, 2026
 Venue: South Cotabato
-Organizer Contact: Magdiwata Festival 2026 Half-Marathon — Facebook: https://www.facebook.com/profile.php?id=61574708908438
+  Organizer Contact: Magdiwata Festival 2026 Half-Marathon — Facebook: https://www.facebook.com/profile.php?id=61574708908438
 
 Event: Malaybalay City Marathon
 Event Link: https://malaybalaymarathon.veent.net

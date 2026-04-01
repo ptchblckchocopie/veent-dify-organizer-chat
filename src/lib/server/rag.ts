@@ -1,5 +1,6 @@
 import { readFileSync, readdirSync, statSync } from 'fs';
 import { join, basename } from 'path';
+import { serverLog } from './server-log';
 
 interface Chunk {
 	content: string;
@@ -77,7 +78,7 @@ function loadKnowledgeBase() {
 	}
 
 	if (!kbPath) {
-		console.error('Knowledge base directory not found');
+		serverLog('error', 'rag', 'Knowledge base directory not found');
 		return;
 	}
 
@@ -102,7 +103,7 @@ function loadKnowledgeBase() {
 	}
 
 	loaded = true;
-	console.log(`[RAG] Loaded ${chunks.length} chunks from ${filesByName.size} documents`);
+	serverLog('info', 'rag', `Loaded ${chunks.length} chunks from ${filesByName.size} documents`);
 }
 
 // Simple stemming — strip common suffixes for better matching

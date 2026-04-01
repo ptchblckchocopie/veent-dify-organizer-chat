@@ -3,6 +3,18 @@
 Keywords: upcoming events, show me events, what events, event listings, event schedule, events this month, events near me, things to do, concerts, fun run, marathon, trail run, music festival
 
 Below is the list of upcoming events, event listings, and event schedules for April 2026 on Veent Tix.
+Event: Dalagan Sa Kaadlawan
+Event Link: https://dalagansakaadlawan.veent.net
+Date: Thursday, April 9, 2026
+Time: 4:00 AM - 8:00 AM
+Venue: Iloilo Provincial Capitol Grounds
+Ticket Prices:
+- 3KM: ₱499.00 (Includes: Dri-fit Shirt, 3 inches Acrylic Medal)
+- 5KM: ₱499.00 (Includes: Dri-fit Shirt, 3 inches Acrylic Medal)
+- 10KM: ₱699.00 (Includes: Full Sublimation Shirt, 4 inches Acrylic Medal)
+  Organizer Contact: Doc Ronnel — Phone: 09171633211 / Ray — Phone: 09778321038
+
+
 Event: Dash and Splash
 Event Link: https://dashandsplash.veent.net
 Date: Saturday, April 11, 2026
@@ -89,6 +101,19 @@ Ticket Prices:
 - VIP Early Bird: ₱1,000.00
 - VIP: ₱1,500.00
 
+Event: 2026 3-DAYS SUMMER ART WORKSHOP
+Event Link: https://dacsummerartcamp.veent.net
+Date: Saturday, April 18 - Saturday, May 2, 2026
+Time: 2:00 PM - 4:00 PM
+Venue: BaristaBrew Cafe, Brittany Square, Fairview, Quezon City
+Ticket Prices:
+- 3-Days Art Workshop Pass: ₱4,599.00 (All materials + food voucher included)
+- Day 1 Pass - Pencil Drawing + Anime Basics (Apr 18): ₱1,500.00
+- Day 2 Pass - Oil Pastel Techniques + Blending (Apr 25): ₱1,650.00
+- Day 3 Pass - Piping Bag Mixed Media Art (May 2): ₱2,000.00
+  Organizer Contact: Dora Delima — Email: info.doraartsandcrafts@gmail.com — Phone: 09275267865 — Facebook: https://www.facebook.com/doraartsandcrafts/
+
+
 Event: Lani Misalucha Live in Cagayan de Oro City (Concert, Lani, Misalucha)
 Event Link: https://lanimisaluchacdo.veent.net
 Date: Saturday, April 18, 2026
@@ -115,6 +140,19 @@ Date: Saturday, April 19, 2026
 Time: 4:30 AM - 9:00 AM
 Venue: Ramon V. Mitra Sports Complex, Puerto Princesa City, Palawan
   Organizer Contact: Joaquin Ortega — Email: jcipuertoprincesaoil@gmail.com
+
+Event: Rampa O Bawi April Fools Show
+Event Link: https://rampaobawi.veent.net
+Date: Saturday, April 25, 2026
+Time: 6:00 PM - 10:00 PM
+Venue: Rampa Club
+Ticket Prices:
+- VIP Couch: ₱1,500.00
+- Cocktail: ₱1,200.00
+- VIP Theater: ₱1,000.00
+- SRO: ₱700.00
+- Meet and Greet (Must be bought with any other tickets): ₱1,000.00
+
 
 Event: Tuburan-360 Trailrun 2026
 Event Link: https://tuburan360trailrun.veent.net

@@ -1,5 +1,6 @@
 import { readFileSync, readdirSync, statSync } from 'fs';
 import { join, basename } from 'path';
+import { serverLog } from './server-log';
 
 interface Chunk {
 	content: string;
@@ -59,7 +60,7 @@ function loadKnowledgeBase() {
 	}
 
 	if (!kbPath) {
-		console.error('[RAG-Tix] Knowledge base directory not found');
+		serverLog('error', 'rag-tix', 'Knowledge base directory not found');
 		return;
 	}
 
@@ -72,7 +73,7 @@ function loadKnowledgeBase() {
 	}
 
 	loaded = true;
-	console.log(`[RAG-Tix] Loaded ${chunks.length} chunks from ${files.length} documents`);
+	serverLog('info', 'rag-tix', `Loaded ${chunks.length} chunks from ${files.length} documents`);
 }
 
 function stem(word: string): string {

@@ -1,4 +1,5 @@
 import { env } from '$env/dynamic/private';
+import { serverLog } from './server-log';
 
 const MAX_RETRIES = 3;
 const BASE_DELAY = 1000;
@@ -67,14 +68,22 @@ async function fetchWithRetry(url: string, options: RequestInit, retries = MAX_R
 	throw new Error('Max retries exceeded');
 }
 
+export interface StreamResult {
+	response: Response;
+	model: string;
+	fallbackIndex: number;
+	success: boolean;
+}
+
 export async function streamChat(
 	message: string,
 	context: string,
 	history: ChatMessage[] = []
-): Promise<Response> {
+): Promise<StreamResult> {
 	const apiKey = env.GROQ_API_KEY;
 	if (!apiKey) {
-		return new Response(JSON.stringify({ error: 'GROQ_API_KEY not configured' }), { status: 500 });
+		serverLog('error', 'groq', 'GROQ_API_KEY not configured');
+		return { response: new Response(JSON.stringify({ error: 'GROQ_API_KEY not configured' }), { status: 500 }), model: 'none', fallbackIndex: -1, success: false };
 	}
 
 	const systemContent = context
@@ -97,6 +106,8 @@ export async function streamChat(
 	];
 
 	let res: Response | null = null;
+	let usedModel = modelChain[0];
+	let usedIndex = 0;
 
 	for (let i = 0; i < modelChain.length; i++) {
 		const model = modelChain[i];
@@ -117,16 +128,23 @@ export async function streamChat(
 		});
 
 		if (res.ok) {
-			if (i > 0) console.log(`[Groq] Fell back to ${model} (choice #${i + 1})`);
+			usedModel = model;
+			usedIndex = i;
+			if (i > 0) serverLog('warn', 'groq', `Fell back to ${model} (choice #${i + 1})`);
 			break;
 		}
 
 		// If rate limited, try next model in chain
 		if (res.status === 429) {
-			console.log(`[Groq] ${model} rate limited, trying next...`);
+			serverLog('warn', 'groq', `${model} rate limited (429), trying next model`, {
+				context: { model, modelIndex: i, totalModels: modelChain.length, status: 429 }
+			});
 			// On last model, wait 5s and retry
 			if (i === modelChain.length - 1) {
-				console.log(`[Groq] All models rate limited, waiting 5s and retrying ${model}`);
+				serverLog('error', 'groq', `All models rate limited, waiting 5s and retrying ${model}`, {
+					details: 'Every model in the fallback chain returned 429. Waiting 5s before final retry.',
+					context: { modelChain, lastModel: model, userMessage: message.slice(0, 200) }
+				});
 				await new Promise(r => setTimeout(r, 5000));
 				res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
 					method: 'POST',
@@ -151,17 +169,24 @@ export async function streamChat(
 	}
 
 	if (!res || !res.ok) {
-		// Return a friendly bot message instead of an error
+		serverLog('error', 'groq', 'All models failed, returning fallback message', {
+			details: `Last HTTP status: ${res?.status || 'null'}`,
+			context: { modelChain, lastStatus: res?.status, userMessage: message.slice(0, 200) }
+		});
 		const fallbackMessage = "I'm a little busy right now — give me a moment and try again!";
-		const encoder = new TextEncoder();
 		const messageId = crypto.randomUUID();
 		const events = [
 			`data: ${JSON.stringify({ event: 'message', answer: fallbackMessage, message_id: messageId, conversation_id: '' })}\n\n`,
 			`data: ${JSON.stringify({ event: 'message_end', message_id: messageId, conversation_id: '' })}\n\n`
 		];
-		return new Response(events.join(''), {
-			headers: { 'Content-Type': 'text/event-stream', 'Cache-Control': 'no-cache', 'Connection': 'keep-alive' }
-		});
+		return {
+			response: new Response(events.join(''), {
+				headers: { 'Content-Type': 'text/event-stream', 'Cache-Control': 'no-cache', 'Connection': 'keep-alive' }
+			}),
+			model: usedModel,
+			fallbackIndex: usedIndex,
+			success: false
+		};
 	}
 
 	// Transform OpenAI SSE format to match what our frontend expects (Dify format)
@@ -213,18 +238,23 @@ export async function streamChat(
 					}
 				}
 			} catch (err) {
-				console.error('[Groq stream error]', err);
+				serverLog('error', 'groq', 'Stream processing error', { error: err, context: { model: usedModel } });
 			} finally {
 				controller.close();
 			}
 		}
 	});
 
-	return new Response(stream, {
-		headers: {
-			'Content-Type': 'text/event-stream',
-			'Cache-Control': 'no-cache',
-			'Connection': 'keep-alive'
-		}
-	});
+	return {
+		response: new Response(stream, {
+			headers: {
+				'Content-Type': 'text/event-stream',
+				'Cache-Control': 'no-cache',
+				'Connection': 'keep-alive'
+			}
+		}),
+		model: usedModel,
+		fallbackIndex: usedIndex,
+		success: true
+	};
 }

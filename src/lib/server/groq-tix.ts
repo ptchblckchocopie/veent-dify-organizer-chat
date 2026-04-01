@@ -1,4 +1,5 @@
 import { env } from '$env/dynamic/private';
+import { serverLog } from './server-log';
 
 const MAX_RETRIES = 3;
 const BASE_DELAY = 1000;
@@ -55,14 +56,22 @@ async function fetchWithRetry(url: string, options: RequestInit, retries = MAX_R
 	throw new Error('Max retries exceeded');
 }
 
+export interface StreamResult {
+	response: Response;
+	model: string;
+	fallbackIndex: number;
+	success: boolean;
+}
+
 export async function streamTixChat(
 	message: string,
 	context: string,
 	history: ChatMessage[] = []
-): Promise<Response> {
+): Promise<StreamResult> {
 	const apiKey = env.TIX_GROQ_API_KEY;
 	if (!apiKey) {
-		return new Response(JSON.stringify({ error: 'TIX_GROQ_API_KEY not configured' }), { status: 500 });
+		serverLog('error', 'groq-tix', 'TIX_GROQ_API_KEY not configured');
+		return { response: new Response(JSON.stringify({ error: 'TIX_GROQ_API_KEY not configured' }), { status: 500 }), model: 'none', fallbackIndex: -1, success: false };
 	}
 
 	const systemContent = context
@@ -85,6 +94,8 @@ export async function streamTixChat(
 	];
 
 	let res: Response | null = null;
+	let usedModel = modelChain[0];
+	let usedIndex = 0;
 
 	for (let i = 0; i < modelChain.length; i++) {
 		const model = modelChain[i];
@@ -105,14 +116,21 @@ export async function streamTixChat(
 		});
 
 		if (res.ok) {
-			if (i > 0) console.log(`[Groq-Tix] Fell back to ${model} (choice #${i + 1})`);
+			usedModel = model;
+			usedIndex = i;
+			if (i > 0) serverLog('warn', 'groq-tix', `Fell back to ${model} (choice #${i + 1})`);
 			break;
 		}
 
 		if (res.status === 429) {
-			console.log(`[Groq-Tix] ${model} rate limited, trying next...`);
+			serverLog('warn', 'groq-tix', `${model} rate limited (429), trying next model`, {
+				context: { model, modelIndex: i, totalModels: modelChain.length, status: 429 }
+			});
 			if (i === modelChain.length - 1) {
-				console.log(`[Groq-Tix] All models rate limited, waiting 5s and retrying ${model}`);
+				serverLog('error', 'groq-tix', `All models rate limited, waiting 5s and retrying ${model}`, {
+					details: 'Every model in the fallback chain returned 429. Waiting 5s before final retry.',
+					context: { modelChain, lastModel: model, userMessage: message.slice(0, 200) }
+				});
 				await new Promise(r => setTimeout(r, 5000));
 				res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
 					method: 'POST',
@@ -136,15 +154,24 @@ export async function streamTixChat(
 	}
 
 	if (!res || !res.ok) {
+		serverLog('error', 'groq-tix', 'All models failed, returning fallback message', {
+			details: `Last HTTP status: ${res?.status || 'null'}`,
+			context: { modelChain, lastStatus: res?.status, userMessage: message.slice(0, 200) }
+		});
 		const fallbackMessage = "I'm a little busy right now — give me a moment and try again!";
 		const messageId = crypto.randomUUID();
 		const events = [
 			`data: ${JSON.stringify({ event: 'message', answer: fallbackMessage, message_id: messageId, conversation_id: '' })}\n\n`,
 			`data: ${JSON.stringify({ event: 'message_end', message_id: messageId, conversation_id: '' })}\n\n`
 		];
-		return new Response(events.join(''), {
-			headers: { 'Content-Type': 'text/event-stream', 'Cache-Control': 'no-cache', 'Connection': 'keep-alive' }
-		});
+		return {
+			response: new Response(events.join(''), {
+				headers: { 'Content-Type': 'text/event-stream', 'Cache-Control': 'no-cache', 'Connection': 'keep-alive' }
+			}),
+			model: usedModel,
+			fallbackIndex: usedIndex,
+			success: false
+		};
 	}
 
 	// Transform OpenAI SSE to Dify format
@@ -183,14 +210,19 @@ export async function streamTixChat(
 					}
 				}
 			} catch (err) {
-				console.error('[Groq-Tix stream error]', err);
+				serverLog('error', 'groq-tix', 'Stream processing error', { error: err, context: { model: usedModel } });
 			} finally {
 				controller.close();
 			}
 		}
 	});
 
-	return new Response(stream, {
-		headers: { 'Content-Type': 'text/event-stream', 'Cache-Control': 'no-cache', 'Connection': 'keep-alive' }
-	});
+	return {
+		response: new Response(stream, {
+			headers: { 'Content-Type': 'text/event-stream', 'Cache-Control': 'no-cache', 'Connection': 'keep-alive' }
+		}),
+		model: usedModel,
+		fallbackIndex: usedIndex,
+		success: true
+	};
 }

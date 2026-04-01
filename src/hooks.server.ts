@@ -1,5 +1,6 @@
 import type { Handle } from '@sveltejs/kit';
 import { isRateLimited } from '$lib/server/rate-limit';
+import { serverLog } from '$lib/server/server-log';
 
 export const handle: Handle = async ({ event, resolve }) => {
 	const { pathname } = event.url;
@@ -10,6 +11,7 @@ export const handle: Handle = async ({ event, resolve }) => {
 		const { limited, remaining, retryAfter } = isRateLimited(ip);
 
 		if (limited) {
+			serverLog('warn', 'rate-limit', `Client rate limited on ${pathname}`, `Retry after ${retryAfter}s`);
 			return new Response(
 				JSON.stringify({ error: 'Too many requests. Please slow down.' }),
 				{

@@ -34,3 +34,26 @@ export function isRateLimited(ip: string): { limited: boolean; remaining: number
 
 	return { limited: false, remaining: maxRequests - entry.count, retryAfter: 0 };
 }
+
+export function getRateLimitStats() {
+	const now = Date.now();
+	let activeClients = 0;
+	let totalRequests = 0;
+	let limitedClients = 0;
+
+	for (const [, entry] of store) {
+		if (now <= entry.resetAt) {
+			activeClients++;
+			totalRequests += entry.count;
+			if (entry.count > maxRequests) limitedClients++;
+		}
+	}
+
+	return {
+		activeClients,
+		totalRequests,
+		limitedClients,
+		maxRequestsPerMinute: maxRequests,
+		windowMs
+	};
+}

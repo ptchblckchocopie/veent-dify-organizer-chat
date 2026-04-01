@@ -1,6 +1,7 @@
 import { env } from '$env/dynamic/private';
 import { search } from '$lib/server/rag';
 import { searchTix } from '$lib/server/rag-tix';
+import { serverLog } from '$lib/server/server-log';
 import type { RequestHandler } from './$types';
 
 export const GET: RequestHandler = async () => {
@@ -40,6 +41,11 @@ export const GET: RequestHandler = async () => {
 	}
 
 	const allOk = Object.values(checks).every(v => v === 'ok');
+
+	if (!allOk) {
+		const failing = Object.entries(checks).filter(([, v]) => v !== 'ok').map(([k, v]) => `${k}=${v}`).join(', ');
+		serverLog('warn', 'health', `Health check degraded: ${failing}`);
+	}
 
 	return new Response(JSON.stringify({ status: allOk ? 'healthy' : 'degraded', checks }), {
 		status: allOk ? 200 : 503,
